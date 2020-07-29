@@ -5,11 +5,14 @@
 #include <termios.h>
 #include <unistd.h>
 struct termios orig_termios;
+
 // Initialize all functions
 void disableRawMode();
 void enableRawMode();
 void die(const char *s);
 
+
+/*** terminal part ***/
 void disableRawMode()
 {
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
@@ -35,13 +38,18 @@ void enableRawMode()
 		die("tcsetattr");
 }
 
+//show error
 void die(const char *s)
 {
 	//prints an error message and exits the program
 	perror(s);
 	exit(1);
 }
+/***End of terminal part ***/
 
+
+//main programe
+/*** Initialize the programe ***/
 int main()
 {
 	enableRawMode();
@@ -64,3 +72,4 @@ int main()
 	}
 	return 0;
 }
+/*** End of Initialize ***/
