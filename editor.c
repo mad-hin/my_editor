@@ -4,13 +4,16 @@
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
+#define CTRL_KEY(k) ((k)&0x1f)
+
 struct termios orig_termios;
 
 // Initialize all functions
 void disableRawMode();
 void enableRawMode();
 void die(const char *s);
-
+char editorReadKey();
+void editorProcessKeypress();
 
 /*** terminal part ***/
 void disableRawMode()
@@ -47,6 +50,32 @@ void die(const char *s)
 }
 /***End of terminal part ***/
 
+/*** input ***/
+// Get character from standard input
+char editorReadKey()
+{
+	int nread;
+	char c;
+	while ((nread = read(STDIN_FILENO, &c, 1)) != 1)
+	{
+		if (nread == -1 && errno != EAGAIN)
+			die("read");
+	}
+	return c;
+}
+/*** input ***/
+void editorProcessKeypress()
+{
+	char c = editorReadKey();
+	switch (c)
+	{
+	case CTRL_KEY('q'): // ctrl + q to quit
+		exit(0);
+		break;
+	}
+}
+
+// End of input
 
 //main programe
 /*** Initialize the programe ***/
@@ -56,19 +85,7 @@ int main()
 
 	while (1)
 	{
-		char c = '\0';
-		if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN)
-			die("read");
-		if (iscntrl(c))
-		{
-			printf("%d\r\n", c);
-		}
-		else
-		{
-			printf("%d ('%c')\r\n", c, c);
-		}
-		if (c == 'q')
-			break;
+		editorProcessKeypress();
 	}
 	return 0;
 }
