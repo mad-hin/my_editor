@@ -1,4 +1,4 @@
 editor: editor.c
-	gcc -O2 editor.c -o editor
+	gcc -Ofast editor.c -o editor -Wall -Wextra -pedantic -std=c99
 clean:
 	rm -f editor
