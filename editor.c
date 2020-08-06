@@ -33,6 +33,8 @@ struct abuf
  * Initialize all functions
  * Prevent compilation error due to function not find
  */
+void abAppend(struct abuf *ab, const char *s, int len);
+void abFree(struct abuf *ab);
 void die(const char *s);
 void disableRawMode();
 void enableRawMode();
@@ -182,7 +184,7 @@ void initEditor()
 {
 	E.cx = 0;
 	E.cy = 0;
-	
+
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1)
 	{
 		die("getWindowSize");
@@ -200,11 +202,13 @@ void editorRefreshScreen()
 
 	// x1b == "esc" in ASCII
 	abAppend(&ab, "\x1b[?25l", 6); // \x1b[?25l is used to show the cursor.
-	abAppend(&ab, "\x1b[H", 3); // \x1b[H is the code for returning the cursor to the home position
+	abAppend(&ab, "\x1b[H", 3);	   // \x1b[H is the code for returning the cursor to the home position
+
 	editorDrawRows(&ab);
 
-	abAppend(&ab, "\x1b[?25h", 6);
-	abAppend(&ab, "\x1b[H", 3); // \x1b[H is the code for returning the cursor to the home position
+	char buf[32];
+	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1); // \x1b[%d;%dH is use to set cursor position
+	abAppend(&ab, buf, strlen(buf));
 
 	write(STDOUT_FILENO, ab.b, ab.len);
 	abFree(&ab);
@@ -258,6 +262,7 @@ void abAppend(struct abuf *ab, const char *s, int len)
 	ab->b = new;
 	ab->len += len;
 }
+
 void abFree(struct abuf *ab)
 {
 	free(ab->b);
