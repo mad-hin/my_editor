@@ -2,7 +2,7 @@
 This is an editor that I follow the tutorial on [https://viewsourcecode.org/snaptoken/kilo/](https://viewsourcecode.org/snaptoken/kilo/)\
 Maybe in the future I will add some my own function or change it.
 ## Compiling
-This project is written in C, therefore you need a C compiler to compile it\
+This project is written in C, therefore you need a C compiler to compile it
 ### Windows
 1. This project requires **Linux environment**, in order to compile it you may install :
   - Windows Subsystem for Linux (WSL)
@@ -28,7 +28,7 @@ This project is written in C, therefore you need a C compiler to compile it\
       (If it set up is correct, when you type ```gcc --version``` it will show you the version of gcc that you installed)
       6. Clone this repository via Git: ```git clone https://github.com/mad-hin/my_editor.git```
       7. cd to the directory that you installed (i.e. ```cd editor```)
-      8. type ```make``` to compile it\
+      8. type ```make``` to compile it
  - Note that ```MinGW```, ```MinGW-w64``` or``` Visual C++``` **cannot** compile this project
 ### macOS
  - The simplest way: install ```Xcode```
