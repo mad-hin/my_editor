@@ -1,0 +1,3 @@
+/home/marco/editor/CMakeFiles/rebuild_cache.dir
+/home/marco/editor/CMakeFiles/edit_cache.dir
+/home/marco/editor/CMakeFiles/editor.dir
