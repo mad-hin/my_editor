@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -24,10 +25,17 @@ enum editorKey {
 };
 
 /***User Defined Data Types ***/
+typedef struct erow {
+    int size;
+    char *chars;
+} erow;
+
 struct editorConfig {
     int cx, cy;
     int screenrows;
     int screencols;
+    int numrows;
+    erow row;
     struct termios orig_termios;
 };
 // Global struct
@@ -44,6 +52,12 @@ struct abuf {
  * Initialize all functions
  * Prevent compilation error due to function not find
  */
+int editorReadKey();
+
+int getCursorPosition(int *rows, int *cols);
+
+int getWindowSize(int *rows, int *cols);
+
 void abAppend(struct abuf *ab, const char *s, int len);
 
 void abFree(struct abuf *ab);
@@ -52,23 +66,19 @@ void die(const char *s);
 
 void disableRawMode();
 
-void enableRawMode();
+void editorDrawRows(struct abuf *ab);
 
-int editorReadKey();
+void editorMoveCursor(int key);
+
+void editorOpen();
 
 void editorProcessKeypress();
 
 void editorRefreshScreen();
 
-void editorMoveCursor(int key);
-
-void editorDrawRows(struct abuf *ab);
+void enableRawMode();
 
 void initEditor();
-
-int getCursorPosition(int *rows, int *cols);
-
-int getWindowSize(int *rows, int *cols);
 
 /*** terminal part ***/
 void disableRawMode() {
@@ -285,6 +295,7 @@ void editorMoveCursor(int key) {
 int main() {
     enableRawMode();
     initEditor();
+    editorOpen();
 
     while (1) {
         editorRefreshScreen();
@@ -297,6 +308,7 @@ int main() {
 void initEditor() {
     E.cx = 0;
     E.cy = 0;
+    E.numrows = 0;
 
     if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
         die("getWindowSize");
@@ -370,3 +382,15 @@ void abFree(struct abuf *ab) {
     free(ab->b);
 }
 // End of Append Buffer part
+
+/*** File i/o ***/
+void editorOpen() {
+    char *line = "Hello, world!";
+    ssize_t linelen = 13;
+    E.row.size = linelen;
+    E.row.chars = malloc(linelen + 1);
+    memcpy(E.row.chars, line, linelen);
+    E.row.chars[linelen] = '\0';
+    E.numrows = 1;
+}
+// End of File i/o part
