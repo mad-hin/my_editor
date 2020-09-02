@@ -1,6 +1,12 @@
 # my_editor
 This is an editor that I follow the tutorial on [https://viewsourcecode.org/snaptoken/kilo/](https://viewsourcecode.org/snaptoken/kilo/)\
 Maybe in the future I will add some my own function or change it.
+## Requirement
+- A C compiler
+- Cmake
+- Make
+- Linux Environment
+
 ## Compiling
 This project is written in C, therefore you need a C compiler to compile it
 ### Windows
@@ -14,38 +20,45 @@ This project is written in C, therefore you need a C compiler to compile it
         - type **"Linux"**
         - Choose one to install (i.e. Ubuntu 20.04 LTS)
       3. Set up your distribution
-      4. Install ```gcc``` and ```make```
-        - type: ```sudo apt-get install gcc make```
+      4. Install ```gcc```, ```cmake``` and ```make```
+        - type: ```sudo apt-get install gcc cmake make```
       5. Clone this repository via Git: ```git clone https://github.com/mad-hin/my_editor.git```
       6. cd to the directory that you installed (i.e. ```cd editor```)
-      7. type ```make``` to compile it
+      7. type ```cmake .``` to compile the makefile
+      8. type ```make``` to compile
   - Cygwin
     - Install Cygwin
       1. Download the installer from [cygwin.com/install.html](cygwin.com/install.html)
-      2. During install **Remember** select the ```gcc-core``` and ```make``` packages which are in ```devel``` category
+      2. During install **Remember** select the ```gcc-core```, ```make``` and ```cmake``` packages which are in ```devel``` category
       4. Set Environment Variables 
       5. Open Cygwin terminal program\
       (If it set up is correct, when you type ```gcc --version``` it will show you the version of gcc that you installed)
       6. Clone this repository via Git: ```git clone https://github.com/mad-hin/my_editor.git```
       7. cd to the directory that you installed (i.e. ```cd editor```)
-      8. type ```make``` to compile it
- - Note that ```MinGW```, ```MinGW-w64``` or``` Visual C++``` **cannot** compile this project
+      8. type ```cmake .``` to compile the makefile
+      9. type ```make``` to compile it
+ - Note that ```MinGW```or  ```MinGW-w64``` or``` Visual C++``` **cannot** compile this project
 ### macOS
  - The simplest way: install ```Xcode```
  - Clone this repository via Git: ```git clone https://github.com/mad-hin/my_editor.git```
   - cd to the directory that you installed (i.e. ```cd editor```)
+  - type ```cmake .``` to compile the makefile
   - type ```make``` to compile it
 ### Linux 
-  - install ```gcc``` and ```make``` by type the command: ```sudo apt-get install gcc make```\
-   (note that this command may not work for some Linux distro ```i.e. Manjaro Linux```)
+  - install ```gcc```, ```make``` and ```cmake``` by type the command: ```sudo apt-get install gcc make cmake```\
+   (note that this command may not work for some Linux distro ```i.e. Manjaro Linux```)\
+   (check sutiable the method or command to install those 3 items of your Linux distro)
    - Clone this repository via Git: ```git clone https://github.com/mad-hin/my_editor.git```
   - cd to the directory that you installed (i.e. ```cd editor```)
   - type ```make``` to compile it
 ## Run editor
-  1. type ```make run``` to compile and run the program
+  1. type ```make``` to compile 
+  2. type ```./editor``` to run the program\
+  (When writing a ```Makefile``` by myself, I can make a command call ```make run``` to compile and run. However, I **do not** know how to make this command with cmake)\
+  (If you know how to make this command, please held an issue or pull request to change the ```CMakeList.txt``` for me)
 ## Remove editor
   1. type ```make clean``` to remove
-## Copyright of the orginal work
+## Copyright of the original work
 As I said in beginning, this editor is following the tutorial on [https://viewsourcecode.org/snaptoken/kilo/](https://viewsourcecode.org/snaptoken/kilo/) which was [originally written](https://github.com/antirez/kilo) by [Salvatore Sanfilippo](https://github.com/antirez)  aka antirez and is released under the BSD 2 clause license (see file ```Source LICENSE```) and being [modified](https://github.com/snaptoken/kilo-tutorial) by [snaptoken](https://github.com/snaptoken) under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 ## License
 For the part that I modified it is under BSD-2-Clause License [tl;dr](https://tldrlegal.com/license/bsd-2-clause-license-(freebsd))

@@ -1,4 +1,5 @@
 /usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" //wsl$/Ubuntu-20.04/home/marco/editor
-bash: line 0: cd: //wsl$/Ubuntu-20.04/home/marco/editor/cmake-build-debug-wsl: Permission denied
+bash: line 0: cd: //wsl$/Ubuntu-20.04/home/marco/editor: Permission denied
 CMake Error: The source directory "//wsl$/Ubuntu-20.04/home/marco/editor" does not exist.
 Specify --help for usage, or press the help button on the CMake GUI.
+Unable to determine product file path for target editor. Running and debugging will be unavailable.
