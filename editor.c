@@ -40,6 +40,7 @@ struct editorConfig {
     int screenrows;
     int screencols;
     int numrows;
+    int coloff;
     int rowoff;
     erow *row;
     struct termios orig_termios;
@@ -88,6 +89,8 @@ void initEditor();
 
 void editorAppendRow(char *s, size_t len);
 
+void editorScroll();
+
 /*** terminal part ***/
 void disableRawMode() {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1)
@@ -116,7 +119,7 @@ void enableRawMode() {
 void die(const char *s) {
     // x1b == "esc" in ASCII
     write(STDOUT_FILENO, "\x1b[2J", 4); // \x1b[2J is the code for clearing the screen and set cursor to home
-    write(STDOUT_FILENO, "\x1b[H", 3);    // \x1b[H is the code for returning the cursor to the home position
+    write(STDOUT_FILENO, "\x1b[H", 3);  // \x1b[H is the code for returning the cursor to the home position
     //prints an error message and exits the program
     perror(s);
     exit(1);
@@ -251,7 +254,7 @@ void editorProcessKeypress() {
         case CTRL_KEY('q'): // ctrl + q to quit
             // x1b == "esc" in ASCII
             write(STDOUT_FILENO, "\x1b[2J", 4); // \x1b[2J is the code for clearing the screen and set cursor to home
-            write(STDOUT_FILENO, "\x1b[H", 3);    // \x1b[H is the code for returning the cursor to the home position
+            write(STDOUT_FILENO, "\x1b[H", 3);  // \x1b[H is the code for returning the cursor to the home position
             exit(0);
             break;
 
@@ -280,9 +283,7 @@ void editorMoveCursor(int key) {
             }
             break;
         case ARROW_RIGHT:
-            if (E.cx != E.screencols - 1) {
-                E.cx++;
-            }
+            E.cx++;
             break;
         case ARROW_UP:
             if (E.cy != 0) {
@@ -290,7 +291,7 @@ void editorMoveCursor(int key) {
             }
             break;
         case ARROW_DOWN:
-            if (E.cy != E.screenrows - 1) {
+            if (E.cy < E.numrows) {
                 E.cy++;
             }
             break;
@@ -319,6 +320,7 @@ void initEditor() {
     E.cx = 0;
     E.cy = 0;
     E.rowoff = 0;
+    E.coloff = 0;
     E.numrows = 0;
     E.row = NULL;
 
@@ -333,16 +335,19 @@ void initEditor() {
 /*** output ***/
 // Clear the screen and reposition the cursor
 void editorRefreshScreen() {
+    editorScroll();
+
     struct abuf ab = ABUF_INIT;
 
     // x1b == "esc" in ASCII
     abAppend(&ab, "\x1b[?25l", 6); // \x1b[?25l is used to show the cursor.
-    abAppend(&ab, "\x1b[H", 3);       // \x1b[H is the code for returning the cursor to the home position
+    abAppend(&ab, "\x1b[H", 3);    // \x1b[H is the code for returning the cursor to the home position
 
     editorDrawRows(&ab);
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1); // \x1b[%d;%dH is use to set cursor position
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1,
+             E.cx + 1); // \x1b[%d;%dH is use to set cursor position
     abAppend(&ab, buf, strlen(buf));
 
     write(STDOUT_FILENO, ab.b, ab.len);
@@ -354,7 +359,7 @@ void editorDrawRows(struct abuf *ab) {
     int y;
     for (y = 0; y < E.screenrows; y++) {
         int filerow = y + E.rowoff;
-        if (filerow >= E.numrows)  {
+        if (filerow >= E.numrows) {
             if (E.numrows == 0 && y == E.screenrows / 3) {
                 char welcome[80];
                 int welcomelen = snprintf(welcome, sizeof(welcome),
@@ -373,17 +378,32 @@ void editorDrawRows(struct abuf *ab) {
                 abAppend(ab, "~", 1);
             }
         } else {
-            int len = E.row[filerow].size;
+            int len = E.row[filerow].size - E.coloff;
+            if (len < 0) len = 0;
             if (len > E.screencols) len = E.screencols;
-            abAppend(ab, E.row[filerow].chars, len);
+            abAppend(ab, &E.row[filerow].chars[E.coloff], len);
         }
-
 
         abAppend(ab, "\x1b[K", 3); // Erase from cursor to end of line
 
         if (y < E.screenrows - 1) {
             abAppend(ab, "\r\n", 2);
         }
+    }
+}
+
+void editorScroll() {
+    if (E.cy < E.rowoff) {
+        E.rowoff = E.cy;
+    }
+    if (E.cy >= E.rowoff + E.screenrows) {
+        E.rowoff = E.cy - E.screenrows + 1;
+    }
+    if (E.cx < E.coloff) {
+        E.coloff = E.cx;
+    }
+    if (E.cx >= E.coloff + E.screencols) {
+        E.coloff = E.cx - E.screencols + 1;
     }
 }
 // End of output
@@ -406,7 +426,8 @@ void abFree(struct abuf *ab) {
 /*** File i/o ***/
 void editorOpen(char *filename) {
     FILE *fp = fopen(filename, "r");
-    if (!fp) die("fopen");
+    if (!fp)
+        die("fopen");
     char *line = NULL;
     size_t linecap = 0;
     ssize_t linelen;

@@ -53,7 +53,7 @@ This project is written in C, therefore you need a C compiler to compile it
   - type ```make``` to compile it
 ## Run editor
   1. type ```make``` to compile 
-  2. type ```./editor``` to run the program\
+  2. type ```./editor <file name>``` to run the program\
   (When writing a ```Makefile``` by myself, I can make a command call ```make run``` to compile and run. However, I **do not** know how to make this command with cmake)\
   (If you know how to make this command, please held an issue or pull request to change the ```CMakeList.txt``` for me)
 ## Remove editor
