@@ -347,7 +347,7 @@ void editorRefreshScreen() {
 
     char buf[32];
     snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1,
-             E.cx + 1); // \x1b[%d;%dH is use to set cursor position
+             (E.cx - E.coloff) + 1); // \x1b[%d;%dH is use to set cursor position
     abAppend(&ab, buf, strlen(buf));
 
     write(STDOUT_FILENO, ab.b, ab.len);
