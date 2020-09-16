@@ -1,1 +1,1 @@
-/usr/bin/cc    CMakeFiles/editor.dir/editor.c.o  -o editor 
+/usr/bin/cc -g   CMakeFiles/editor.dir/editor.c.o  -o editor 
