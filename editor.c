@@ -276,14 +276,27 @@ void editorProcessKeypress() {
 }
 
 void editorMoveCursor(int key) {
+    erow *row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
+
     switch (key) {
         case ARROW_LEFT:
             if (E.cx != 0) {
                 E.cx--;
+            } else if (E.cy > 0) {
+                // move to the left most of the line
+                E.cy--;
+                E.cx = E.row[E.cy].size;
             }
             break;
         case ARROW_RIGHT:
-            E.cx++;
+            // not allowing the user to scroll past the end of the current line
+            if (row && E.cx < row->size) {
+                E.cx++;
+            } else if (row && E.cx == row->size) {
+                // move to the right most of the line
+                E.cy++;
+                E.cx = 0;
+            }
             break;
         case ARROW_UP:
             if (E.cy != 0) {
@@ -295,6 +308,13 @@ void editorMoveCursor(int key) {
                 E.cy++;
             }
             break;
+    }
+
+    // correct length of the end of the current line
+    row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
+    int rowlen = row ? row->size : 0;
+    if (E.cx > rowlen) {
+        E.cx = rowlen;
     }
 }
 // End of input
