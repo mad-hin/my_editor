@@ -32,7 +32,9 @@ enum editorKey {
 /***User Defined Data Types ***/
 typedef struct erow {
     int size;
+    int rsize;
     char *chars;
+    char *render;
 } erow;
 
 struct editorConfig {
@@ -91,6 +93,8 @@ void editorAppendRow(char *s, size_t len);
 
 void editorScroll();
 
+void editorUpdateRow(erow *row);
+
 /*** terminal part ***/
 void disableRawMode() {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1)
@@ -123,6 +127,7 @@ void die(const char *s) {
     //prints an error message and exits the program
     perror(s);
     exit(1);
+    f
 }
 
 // Get the current window size
@@ -465,11 +470,30 @@ void editorOpen(char *filename) {
 /*** row operations ***/
 void editorAppendRow(char *s, size_t len) {
     E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
+
     int at = E.numrows;
     E.row[at].size = len;
     E.row[at].chars = malloc(len + 1);
     memcpy(E.row[at].chars, s, len);
     E.row[at].chars[len] = '\0';
+
+    E.row[at].rsize = 0;
+    E.row[at].render = NULL;
+	editorUpdateRow(&E.row[at]);
+
     E.numrows++;
+}
+
+void editorUpdateRow(erow *row){
+	free(row->render);
+	row->render = malloc(row->size + 1);
+
+	int j;
+	int idx = 0;
+	for(j = 0; j < row->size; j++){
+		row->render[idx++] = row->chars[j];
+	}
+	row->render[idx] = '\0';
+	row->rsize = idx;
 }
 // End of row operations
